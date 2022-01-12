@@ -3,14 +3,19 @@ const {GraphQLServer} = require('graphql-yoga');
 const typeDefs = `
 type Query {
     helloWorld: String!
-    users: [User!]!
+    users(text: String): [User!]!
+    user(userId: ID!): User
+}
+
+type Mutation {
+    createUser(id: ID!, firstName: String!, email: String!, age: Int): User
 }
 
 type User {
     id: ID!
     firstName: String!
     email: String!
-    age: Int!
+    age: Int
 }
 `;
 
@@ -32,13 +37,35 @@ let users = [
 const resolvers = {
   Query: {
     helloWorld: () => `Hello World!`,
-    users: (parent, args, context, info) => users,
+    users: (parent, args, context, info) =>
+      args.text
+        ? users.filter(user =>
+            user.firstName.toLowerCase().includes(args.text.toLowerCase()),
+          )
+        : users,
+    user: (parent, args, context, info) => {
+      console.log(args);
+      return users.find(user => user.id === args.userId);
+    },
+  },
+  Mutation: {
+    createUser: (parent, args, context, info) => {
+      const newUser = {
+        id: args.id,
+        firstName: args.firstName,
+        email: args.email,
+        age: args.age,
+      };
+
+      users.push(newUser);
+      return newUser;
+    },
   },
   User: {
     id: parent => parent.id,
     firstName: parent => parent.firstName,
     email: parent => parent.email,
-    age: parent => Math.round(Math.random() * 4 + 1) * parent.age,
+    age: parent => parent.age,
   },
 };
 
