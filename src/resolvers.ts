@@ -1,92 +1,94 @@
-import {users} from './data/users';
-import {todos} from './data/todos';
-
-import {User} from './types';
-import {createUserId} from './utils';
-import {usersOnTodos} from './data/usersOnTodos';
-
-const newUserIdInc = createUserId();
-const newTodoId = createUserId();
+import {TodoUpdate} from './types';
 
 export const resolvers = {
   Query: {
     helloWorld: () => `Hello World!`,
-    users: (_: unknown, args: {text: string}) =>
-      args.text
-        ? users.filter(user =>
-            user.firstName.toLowerCase().includes(args.text.toLowerCase()),
-          )
-        : users,
-    user: (_: unknown, args: {userId: string}) => {
-      console.log(args);
-      return users.find(user => user.id === args.userId);
-    },
-    todos: () => {
-      return todos;
-    },
+    users: (_: unknown, __: unknown, context: any) =>
+      context.prisma.user.findMany(),
+    user: (_: unknown, args: {userId: string}, context: any) =>
+      context.prisma.user.findUnique({
+        where: {id: parseInt(args.userId)},
+      }),
+    todos: (_: unknown, __: unknown, context: any) =>
+      context.prisma.todo.findMany(),
   },
   Mutation: {
-    createUser: (_: unknown, args: {[key: string]: any}) => {
-      const userAlreadyExist = users.some(user => user.email === args.email);
-
-      if (userAlreadyExist) {
-        throw new Error('User already exist.');
-      } else {
-        const newUser = {
-          id: newUserIdInc().toString(),
+    createUser: (_: unknown, args: {[key: string]: any}, context: any) =>
+      context.prisma.user.create({
+        data: {
           firstName: args.firstName,
           email: args.email,
           age: args.age,
-        };
-
-        users.push(newUser);
-        return newUser;
-      }
-    },
-    deleteUser: (_: unknown, args: {userId: string}) => {
-      let user;
-      const userToRemove: any = users.findIndex(elem => {
-        if (elem.id === args.userId) {
-          user = elem;
-          return true;
-        } else {
-          return false;
-        }
+        },
+      }),
+    deleteUser: async (_: unknown, args: {userId: string}, context: any) => {
+      await context.prisma.todo.deleteMany({
+        where: {userId: parseInt(args.userId)},
       });
 
-      user ? users.splice(userToRemove, 1) : '';
-      return user;
-    },
-    updateUser: (_: unknown, args: User) => {
-      const userIndex = users.findIndex(elem => elem.id === args.userId);
-
-      users[userIndex] = {...users[userIndex], ...args.input};
-      return users[userIndex];
-    },
-    createTodo: (_: unknown, args: any) => {
-      const newTodo = {
-        id: newTodoId().toString(),
-        name: args.name,
-        isComplete: args.isComplete,
-        userId: args.userId,
-      };
-
-      todos.push(newTodo);
-      return newTodo;
-    },
-    deleteTodo: (_: unknown, args: {todoId: string}) => {
-      let todo;
-      const todoToRemove = todos.findIndex(elem => {
-        if (elem.id === args.todoId) {
-          todo = elem;
-          return true;
-        } else {
-          return false;
-        }
+      return context.prisma.user.delete({
+        where: {id: parseInt(args.userId)},
       });
+    },
+    updateUser: (_: unknown, args: any, context: any) =>
+      context.prisma.user.update({
+        where: {
+          id: parseInt(args.userId),
+        },
+        data: {
+          firstName: args.input.firstName,
+          email: args.input.email,
+          age: args.input.age,
+        },
+      }),
+    createTodo: (_: unknown, args: any, context: any) =>
+      context.prisma.todo.create({
+        data: {
+          name: args.name,
+          isComplete: args.isComplete,
+          user: {connect: {id: parseInt(args.userId)}},
+        },
+      }),
+    deleteTodo: (_: unknown, args: {todoId: string}, context: any) =>
+      context.prisma.todo.delete({
+        where: {
+          id: parseInt(args.todoId),
+        },
+      }),
+    updateTodo: (_: unknown, args: TodoUpdate, context: any) =>
+      context.prisma.todo.update({
+        where: {
+          id: parseInt(args.todoId),
+        },
+        data: {
+          name: args.name,
+          isComplete: args.isComplete,
+        },
+      }),
+    deleteTodos: (_: unknown, args: {todoIds: [string]}, context: any) => {
+      const newIds = args.todoIds.map(id => parseInt(id));
 
-      todo ? todos.splice(todoToRemove, 1) : '';
-      return todo;
+      return context.prisma.todo.deleteMany({
+        where: {
+          id: {
+            in: newIds,
+          },
+        },
+      });
+    },
+    resetTodos: (_: unknown, args: {todoIds: [string]}, context: any) => {
+      const todosToReset = args.todoIds.map(id => parseInt(id));
+
+      return context.prisma.todo.updateMany({
+        where: {
+          id: {
+            in: todosToReset,
+          },
+        },
+        data: {
+          isComplete: false,
+        },
+      });
     },
   },
   User: {
@@ -94,29 +96,19 @@ export const resolvers = {
     firstName: (parent: {firstName: string}) => parent.firstName,
     email: (parent: {email: string}) => parent.email,
     age: (parent: {age: number}) => parent.age,
-    todos: (parent: any) => {
-      const todoIds: any = [];
-
-      usersOnTodos.map(elem => {
-        if (elem.userId === parent.id) {
-          todoIds.push(elem.todoId);
-        }
-      });
-
-      return todos.filter(elem => todoIds.includes(elem.id));
-    },
+    todos: (parent: any, _: unknown, context: any) =>
+      context.prisma.todo.findMany({
+        where: {
+          userId: parent.id,
+        },
+      }),
   },
   Todo: {
-    user: (parent: any) => {
-      const userIds: any = [];
-
-      usersOnTodos.map(elem => {
-        if (elem.todoId === parent.id) {
-          userIds.push(elem.userId);
-        }
-      });
-
-      return users.filter(elem => userIds.includes(elem.id));
-    },
+    user: (parent: any, _: unknown, context: any) =>
+      context.prisma.user.findUnique({
+        where: {
+          id: parent.userId,
+        },
+      }),
   },
 };
