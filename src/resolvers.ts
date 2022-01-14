@@ -1,4 +1,5 @@
 import {TodoUpdate} from './types';
+import bcrypt from 'bcryptjs';
 
 export const resolvers = {
   Query: {
@@ -11,16 +12,52 @@ export const resolvers = {
       }),
     todos: (_: unknown, __: unknown, context: any) =>
       context.prisma.todo.findMany(),
+    me: (_: unknown, __: unknown, context: any) => {
+      console.log(context.isAuthenticated());
+      context.getUser();
+    },
   },
   Mutation: {
-    createUser: (_: unknown, args: {[key: string]: any}, context: any) =>
-      context.prisma.user.create({
+    signUp: async (_: unknown, args: {[key: string]: any}, context: any) => {
+      const password = await bcrypt.hash(args.password, 10);
+
+      await context.prisma.user.create({
         data: {
           firstName: args.firstName,
           email: args.email,
+          password,
           age: args.age,
         },
-      }),
+      });
+
+      const {user} = await context.authenticate('graphql-local', {
+        email: args.email,
+        password: args.password,
+      });
+
+      context.login(user);
+
+      return user;
+    },
+    login: async (
+      _: unknown,
+      {email, password}: {email: string; password: string},
+      context: any,
+    ) => {
+      console.log('First login');
+
+      const {user} = await context.authenticate('graphql-local', {
+        email,
+        password,
+      });
+
+      await context.login(user);
+      // console.log(user);
+      return user;
+    },
+    logout: (_: unknown, __: unknown, context: any) => {
+      context.logout();
+    },
     deleteUser: async (_: unknown, args: {userId: string}, context: any) => {
       await context.prisma.todo.deleteMany({
         where: {userId: parseInt(args.userId)},
