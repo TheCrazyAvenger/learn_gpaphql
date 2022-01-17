@@ -2,6 +2,10 @@
 #
 .DS_Store
 
+#Database
+
+src/server/prisma/dev.db
+
 # Xcode
 #
 build/
