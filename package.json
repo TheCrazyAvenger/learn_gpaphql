@@ -50,6 +50,9 @@
   "resolutions": {
     "@types/react": "^17"
   },
+  "prisma": {
+    "schema": "src/server/prisma/schema.prisma"
+  },
   "jest": {
     "preset": "react-native",
     "moduleFileExtensions": [
