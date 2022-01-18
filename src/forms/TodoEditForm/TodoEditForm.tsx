@@ -5,19 +5,24 @@ import {styles} from './styles';
 import {TextInput} from 'react-native-paper';
 import {colors} from '../../constants';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {TodoFormProps} from '..';
+import {TodoEditFormProps} from '..';
 import {addTodoSchema} from '../schemas';
 
-export const TodoForm: React.FC<TodoFormProps> = ({createTodo}) => {
+export const TodoEditForm: React.FC<TodoEditFormProps> = ({
+  updateTodo,
+  title,
+  loading,
+  setIsEditing,
+}) => {
   return (
     <Formik
       validationSchema={addTodoSchema}
       initialValues={{
-        title: '',
+        title,
       }}
-      onSubmit={(values, {resetForm}) => {
-        createTodo(values.title);
-        resetForm();
+      onSubmit={values => {
+        updateTodo(values.title);
+        setIsEditing(false);
       }}>
       {({
         handleSubmit,
@@ -27,12 +32,13 @@ export const TodoForm: React.FC<TodoFormProps> = ({createTodo}) => {
         touched,
         values,
       }) => (
-        <View style={styles.container}>
-          <View style={{width: '80%'}}>
+        <>
+          <View style={{width: '73%'}}>
             <TextInput
               value={values.title}
               activeOutlineColor={colors.red}
               mode="outlined"
+              disabled={loading}
               error={!errors.title}
               onFocus={() => setFieldTouched('title', false)}
               onBlur={() => setFieldTouched('title', true)}
@@ -44,15 +50,24 @@ export const TodoForm: React.FC<TodoFormProps> = ({createTodo}) => {
             )}
           </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              handleSubmit();
-            }}
-            activeOpacity={0.7}
-            style={styles.addButton}>
-            <Icon name="add" color={colors.white} size={37} />
-          </TouchableOpacity>
-        </View>
+          <View style={styles.buttons}>
+            <TouchableOpacity disabled={loading} onPress={handleSubmit}>
+              <Icon
+                name="done"
+                style={{marginRight: 10}}
+                color={loading ? colors.gray : colors.green}
+                size={30}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity disabled={loading} onPress={setIsEditing}>
+              <Icon
+                name="close"
+                color={loading ? colors.gray : colors.red}
+                size={30}
+              />
+            </TouchableOpacity>
+          </View>
+        </>
       )}
     </Formik>
   );

@@ -1,28 +1,14 @@
 import React from 'react';
 import {ActivityIndicator, Text, View} from 'react-native';
-import {useQuery, useMutation} from '@apollo/client';
 import {ScrollView} from 'react-native-gesture-handler';
 import {TodoItem} from '../../components';
 import {styles} from './styles';
 import {TodoForm} from '../../forms';
-import {CREATE_TODO, TODOS_QUERY} from '../../graphql';
+import {useCreateTodoItem, useTodoItems} from '../../hooks';
 
 export const DashboardScreen: React.FC = () => {
-  const {data, loading, error} = useQuery(TODOS_QUERY);
-  const [createTodo] = useMutation(CREATE_TODO, {
-    update(cache, {data: {createTodo}}) {
-      const {todos}: any = cache.readQuery({
-        query: TODOS_QUERY,
-      });
-
-      cache.writeQuery({
-        query: TODOS_QUERY,
-        data: {
-          todos: [createTodo, ...todos],
-        },
-      });
-    },
-  });
+  const {createTodo} = useCreateTodoItem();
+  const {data, loading} = useTodoItems();
 
   const handleCreateTodo = (title: string) => {
     createTodo({

@@ -5,7 +5,6 @@ export const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.white,
     padding: 20,
-    paddingRight: 5,
     marginHorizontal: 10,
     elevation: 5,
     marginBottom: 20,
@@ -16,5 +15,9 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  buttons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
