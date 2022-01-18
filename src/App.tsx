@@ -1,18 +1,26 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {
+  ApolloProvider,
+  ApolloClient,
+  createHttpLink,
+  InMemoryCache,
+} from '@apollo/client';
+import {AppNavigator} from './navigation/AppNavigator';
+import 'react-native-gesture-handler';
 
-export const App = () => {
+const httpLink = createHttpLink({
+  uri: 'http://192.168.170.68:4000/graphql',
+});
+
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+});
+
+export const App: React.FC = () => {
   return (
-    <View style={styles.container}>
-      <Text>Learn GraphQL</Text>
-    </View>
+    <ApolloProvider client={client}>
+      <AppNavigator />
+    </ApolloProvider>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

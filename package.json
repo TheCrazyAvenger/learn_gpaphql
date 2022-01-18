@@ -10,13 +10,17 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.7",
     "@prisma/client": "^3.8.0",
+    "@react-navigation/native": "^6.0.6",
+    "@react-navigation/stack": "^6.0.11",
     "apollo-server": "^3.6.1",
     "apollo-server-core": "^3.6.1",
     "apollo-server-express": "^3.6.1",
     "bcryptjs": "^2.4.3",
     "express": "^4.17.2",
     "express-session": "^1.17.2",
+    "formik": "^2.2.9",
     "graphql": "^16.2.0",
     "graphql-passport": "^0.6.4",
     "graphql-tag": "^2.12.6",
@@ -24,7 +28,14 @@
     "passport": "^0.5.2",
     "react": "17.0.2",
     "react-native": "0.66.4",
-    "uuid": "^8.3.2"
+    "react-native-bouncy-checkbox": "^2.1.10",
+    "react-native-gesture-handler": "^2.2.0",
+    "react-native-paper": "^4.11.2",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screens": "^3.10.1",
+    "react-native-vector-icons": "^9.0.0",
+    "uuid": "^8.3.2",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -35,6 +46,7 @@
     "@types/jest": "^26.0.23",
     "@types/passport": "^1.0.7",
     "@types/react-native": "^0.66.4",
+    "@types/react-native-vector-icons": "^6.4.10",
     "@types/react-test-renderer": "^17.0.1",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
