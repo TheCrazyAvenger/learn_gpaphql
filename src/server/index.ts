@@ -18,7 +18,6 @@ passport.serializeUser((user: any, done) => {
 });
 
 passport.deserializeUser((id: any, done) => {
-  console.log(id);
   const user = prisma.user.findUnique({
     where: {id},
   });
@@ -28,7 +27,6 @@ passport.deserializeUser((id: any, done) => {
 
 passport.use(
   new GraphQLLocalStrategy(async (email, password, done) => {
-    console.log('Second login');
     const matchingUser = await prisma.user.findUnique({
       //@ts-ignore
       where: {email: email},
@@ -42,7 +40,7 @@ passport.use(
 
       error = valid ? '' : new Error('Invalid password');
     }
-    console.log('Third login');
+
     done(error, matchingUser);
   }),
 );
@@ -79,7 +77,7 @@ const startApolloServer = async () => {
   server.applyMiddleware({
     app,
     cors: {
-      origin: 'https://studio.apollographql.com',
+      origin: 'https://localhost:3000',
       credentials: true,
     },
   });

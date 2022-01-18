@@ -7,9 +7,11 @@ import {
 } from '@apollo/client';
 import {AppNavigator} from './navigation/AppNavigator';
 import 'react-native-gesture-handler';
+import {NavigationContainer} from '@react-navigation/native';
 
 const httpLink = createHttpLink({
   uri: 'http://192.168.170.68:4000/graphql',
+  credentials: 'include',
 });
 
 const client = new ApolloClient({
@@ -19,8 +21,10 @@ const client = new ApolloClient({
 
 export const App: React.FC = () => {
   return (
-    <ApolloProvider client={client}>
-      <AppNavigator />
-    </ApolloProvider>
+    <NavigationContainer>
+      <ApolloProvider client={client}>
+        <AppNavigator />
+      </ApolloProvider>
+    </NavigationContainer>
   );
 };

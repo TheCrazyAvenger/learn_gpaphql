@@ -1,4 +1,5 @@
 import {StyleSheet} from 'react-native';
+import {colors} from '../../constants';
 
 export const styles = StyleSheet.create({
   container: {
@@ -13,22 +14,28 @@ export const styles = StyleSheet.create({
     fontSize: 25,
     fontWeight: 'bold',
   },
-  filters: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 0,
-    paddingVertical: 10,
+  card: {
+    backgroundColor: colors.white,
+    padding: 20,
+    paddingHorizontal: 10,
+    marginHorizontal: 10,
+    elevation: 5,
+    marginBottom: 20,
+    borderRadius: 5,
+  },
+  viewMoreButton: {
+    textAlign: 'center',
+    color: colors.red,
+    fontSize: 17,
+    textDecorationLine: 'underline',
   },
   noData: {
-    marginTop: 100,
+    marginTop: 10,
     alignSelf: 'center',
   },
   noDataText: {
     textAlign: 'center',
     fontSize: 20,
-  },
-  searchbar: {
-    width: '75%',
+    textDecorationLine: 'underline',
   },
 });

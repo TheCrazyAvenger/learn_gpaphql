@@ -28,15 +28,13 @@ export const Mutation = {
     {email, password}: {email: string; password: string},
     context: any,
   ) => {
-    console.log('First login');
-
     const {user} = await context.authenticate('graphql-local', {
       email,
       password,
     });
 
     await context.login(user);
-    // console.log(user);
+
     return user;
   },
   logout: (_: unknown, __: unknown, context: any) => {

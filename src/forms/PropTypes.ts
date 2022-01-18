@@ -8,3 +8,8 @@ export type TodoEditFormProps = {
   loading: boolean;
   setIsEditing: (...args: any) => void;
 };
+
+export type SignInFormProps = {
+  handleLogin: (...args: any) => void;
+  loading: boolean;
+};

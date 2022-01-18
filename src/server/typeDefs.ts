@@ -5,7 +5,7 @@ export const typeDefs = gql`
     helloWorld: String!
     users(text: String): [User!]!
     user(userId: ID!): User
-    todos: [Todo!]!
+    todos(filter: String, takeStatus: String, userId: ID!): [Todo!]!
     me: User
   }
 

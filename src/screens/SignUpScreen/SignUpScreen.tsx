@@ -2,31 +2,36 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {colors} from '../../constants';
-import {SignInForm} from '../../forms';
-import {useLoginMutation} from '../../hooks';
+import {SignUpForm} from '../../forms';
+import {useSignUp} from '../../hooks';
 import {styles} from './styles';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {useNavigation} from '@react-navigation/native';
 
-export const LoginScreen: React.FC = () => {
+export const SignUpScreen: React.FC = () => {
   const navigation: any = useNavigation();
 
-  const {doLogin, data, error, loading} = useLoginMutation();
+  const {doSignUp, data, error, loading} = useSignUp();
 
-  const handleLogin = async (email: string, password: string) => {
+  const handleLogin = async (
+    email: string,
+    password: string,
+    firstName: string,
+  ) => {
     try {
-      await doLogin({
-        variables: {email, password},
+      await doSignUp({
+        variables: {email, password, firstName},
       });
 
-      const {firstName, email: userEmail, id} = data.login;
+      const {firstName: name, email: userEmail, id} = data.signUp;
 
-      await AsyncStorage.setItem('name', firstName);
+      await AsyncStorage.setItem('name', name);
       await AsyncStorage.setItem('email', userEmail);
       await AsyncStorage.setItem('id', id);
-      navigation.pop();
+
+      navigation.pop(2);
     } catch {
-      // console.log(error);
+      // console.log(1);
     }
   };
 
@@ -37,9 +42,9 @@ export const LoginScreen: React.FC = () => {
           <Icon name="lock-open" color={colors.white} size={45} />
         </View>
       </View>
-      <Text style={styles.title}>Sign In</Text>
+      <Text style={styles.title}>Sign Up</Text>
       {error && <Text style={styles.error}>{error.message}</Text>}
-      <SignInForm handleLogin={handleLogin} loading={loading} />
+      <SignUpForm handleLogin={handleLogin} loading={loading} />
     </View>
   );
 };

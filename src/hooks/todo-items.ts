@@ -3,18 +3,12 @@ import {CREATE_TODO, DELTE_TODO, TODOS_QUERY, UPDATE_TODO} from '../graphql';
 
 export const useCreateTodoItem = () => {
   const [createTodo] = useMutation(CREATE_TODO, {
-    update(cache, {data: {createTodo}}) {
-      const {todos}: any = cache.readQuery({
+    refetchQueries: [
+      {
         query: TODOS_QUERY,
-      });
-
-      cache.writeQuery({
-        query: TODOS_QUERY,
-        data: {
-          todos: [createTodo, ...todos],
-        },
-      });
-    },
+        variables: {takeStatus: null},
+      },
+    ],
   });
   return {createTodo};
 };
@@ -24,30 +18,27 @@ export const useUpdateTodoItem = () => {
   return {updateTodo};
 };
 
-export const useTodoItems = () => {
-  const {data, loading, error} = useQuery(TODOS_QUERY);
+export const useTodoItems = (args: any) => {
+  const {data, loading, error} = useQuery(TODOS_QUERY, {
+    variables: {
+      filter: args.filter,
+      takeStatus: args.takeStatus,
+      userId: args.userId,
+    },
+    fetchPolicy: 'network-only',
+  });
 
   return {data, loading, error};
 };
 
-export const useDeleteTodoItem = () => {
+export const useDeleteTodoItem = (args: any) => {
   const [deleteTodo] = useMutation(DELTE_TODO, {
-    update(cache, {data: {deleteTodo}}) {
-      const {todos}: any = cache.readQuery({
+    refetchQueries: [
+      {
         query: TODOS_QUERY,
-      });
-
-      const updatedTodosList = todos.filter(
-        (elem: any) => elem.id !== deleteTodo.id,
-      );
-
-      cache.writeQuery({
-        query: TODOS_QUERY,
-        data: {
-          todos: updatedTodosList,
-        },
-      });
-    },
+        variables: {takeStatus: args.takeStatus},
+      },
+    ],
   });
   return {deleteTodo};
 };

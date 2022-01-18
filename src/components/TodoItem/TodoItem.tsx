@@ -8,12 +8,19 @@ import {useDeleteTodoItem, useUpdateTodoItem} from '../../hooks';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {TodoEditForm} from '../../forms';
 
-export const TodoItem: React.FC<TodoItemProps> = ({title, isComplete, id}) => {
+export const TodoItem: React.FC<TodoItemProps> = ({
+  title,
+  isComplete,
+  id,
+  takeStatus,
+}) => {
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
   const {updateTodo} = useUpdateTodoItem();
-  const {deleteTodo} = useDeleteTodoItem();
+  const {deleteTodo} = useDeleteTodoItem({
+    takeStatus,
+  });
 
   const handleChange = async () => {
     try {
